@@ -23,7 +23,7 @@ public class DroolsUtilsTest {
         List<BigDecimal> list = new ArrayList<BigDecimal>();
 
         DroolsUtils.newKieSession()
-                .classPathDrlResource("demo.drl", DroolsUtilsTest.class)
+                .classPathDrlResource("demo.drl")
                 .global(ImmutableMap.<String, Object>of("list", list))
                 .insert(Lists.<Object>newArrayList(new BigDecimal("1.5")))
                 .execute();
