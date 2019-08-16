@@ -2,7 +2,6 @@ package com.lin.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -24,8 +23,25 @@ public class DroolsUtilsTest {
 
         DroolsUtils.newKieSession()
                 .classPathDrlResource("demo.drl")
-                .global(ImmutableMap.<String, Object>of("list", list))
-                .insert(Lists.<Object>newArrayList(new BigDecimal("1.5")))
+                .globalMany(ImmutableMap.<String, Object>of("list", list))
+                .insertMany(Lists.<Object>newArrayList(new BigDecimal("1.5")))
+                .execute();
+
+        System.out.println(list.size());
+        System.out.println(list.get(0));
+
+        assertEquals(1, list.size());
+        assertEquals(new BigDecimal("1.5"), list.get(0));
+    }
+
+    @Test
+    public void newKieSession2() {
+        List<BigDecimal> list = new ArrayList<BigDecimal>();
+
+        DroolsUtils.newKieSession()
+                .classPathDrlResource("demo.drl")
+                .global("list", list)
+                .insert(new BigDecimal("1.5"))
                 .execute();
 
         System.out.println(list.size());

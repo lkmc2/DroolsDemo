@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
 import org.kie.api.io.ResourceType;
@@ -25,14 +27,20 @@ public final class DroolsUtils {
     /** 知识库创建器 **/
     private KnowledgeBuilder builder;
 
-    /** 存储 global 对象的 Map **/
-    private Map<String, Object> globalMap;
+    /** 存储单个 global 对象的 Map **/
+    private Map<String, Object> globalSingleMap = Maps.newConcurrentMap();
 
-    /** 存储 global 对象的不可变 Map **/
-    private ImmutableMap<String, Object> globalImmutableMap;
+    /** 存储多个 global 对象的 Map **/
+    private Map<String, Object> globalManyMap;
 
-    /** 存储需要 insert 的对象的列表 **/
-    private List<Object> insertList;
+    /** 存储多个 global 对象的不可变 Map **/
+    private ImmutableMap<String, Object> globalManyImmutableMap;
+
+    /** 存储单个需要 insert 的对象的列表 **/
+    private List<Object> insertSingleList = Lists.newCopyOnWriteArrayList();
+
+    /** 存储多个需要 insert 的对象的列表 **/
+    private List<Object> insertManyList;
 
     /**  单例模式创建 Drool 规则引擎工具类 **/
     private static class DroolsHolder {
@@ -92,32 +100,52 @@ public final class DroolsUtils {
     }
 
     /**
-     * 设置全局变量
+     * 设置单个全局变量
+     * @param name 全局变量名
+     * @return object 全局变量
+     */
+    public DroolsUtils global(String name, Object object) {
+        this.globalSingleMap.put(name, object);
+        return this;
+    }
+
+    /**
+     * 设置多个全局变量
      * @param globalMap 全局变量 Map
      * @return Drool 规则引擎工具类
      */
-    public DroolsUtils global(Map<String, Object> globalMap) {
-        this.globalMap = globalMap;
+    public DroolsUtils globalMany(Map<String, Object> globalMap) {
+        this.globalManyMap = globalMap;
         return this;
     }
 
     /**
-     * 设置全局变量
+     * 设置多个全局变量
      * @param globalMap 全局变量不可变 Map
      * @return Drool 规则引擎工具类
      */
-    public DroolsUtils global(ImmutableMap<String, Object> globalMap) {
-        this.globalImmutableMap = globalMap;
+    public DroolsUtils globalMany(ImmutableMap<String, Object> globalMap) {
+        this.globalManyImmutableMap = globalMap;
         return this;
     }
 
     /**
-     * 设置需要插入的变量列表
+     * 设置单个需要插入的变量
+     * @param object 需要插入的变量
+     * @return Drool 规则引擎工具类
+     */
+    public DroolsUtils insert(Object object) {
+        this.insertSingleList.add(object);
+        return this;
+    }
+
+    /**
+     * 设置多个需要插入的变量列表
      * @param insertList 需要插入的变量列表
      * @return Drool 规则引擎工具类
      */
-    public DroolsUtils insert(List<Object> insertList) {
-        this.insertList = insertList;
+    public DroolsUtils insertMany(List<Object> insertList) {
+        this.insertManyList = insertList;
         return this;
     }
 
@@ -133,22 +161,41 @@ public final class DroolsUtils {
         // 创建会话
         KieSession kSession = kBase.newKieSession();
 
-        if (MapUtil.isNotEmpty(globalMap)) {
-            for (Map.Entry<String, Object> entry : globalMap.entrySet()) {
+        // 存储单个 global 对象的 Map
+        if (MapUtil.isNotEmpty(globalSingleMap)) {
+            for (Map.Entry<String, Object> entry : globalSingleMap.entrySet()) {
                 // 设置全局变量
                 kSession.setGlobal(entry.getKey(), entry.getValue());
             }
         }
 
-        if (ObjectUtil.isNotNull(globalImmutableMap)) {
-            for (Map.Entry<String, Object> entry : globalImmutableMap.entrySet()) {
+        // 存储多个 global 对象的 Map
+        if (MapUtil.isNotEmpty(globalManyMap)) {
+            for (Map.Entry<String, Object> entry : globalManyMap.entrySet()) {
                 // 设置全局变量
                 kSession.setGlobal(entry.getKey(), entry.getValue());
             }
         }
 
-        if (CollectionUtil.isNotEmpty(insertList)) {
-            for (Object obj : insertList) {
+        // 存储多个 global 对象的不可变 Map
+        if (ObjectUtil.isNotNull(globalManyImmutableMap)) {
+            for (Map.Entry<String, Object> entry : globalManyImmutableMap.entrySet()) {
+                // 设置全局变量
+                kSession.setGlobal(entry.getKey(), entry.getValue());
+            }
+        }
+
+        // 存储单个需要 insert 的对象的列表
+        if (CollectionUtil.isNotEmpty(insertSingleList)) {
+            for (Object obj : insertSingleList) {
+                // 插入变量
+                kSession.insert(obj);
+            }
+        }
+
+        // 存储多个需要 insert 的对象的列表
+        if (CollectionUtil.isNotEmpty(insertManyList)) {
+            for (Object obj : insertManyList) {
                 // 插入变量
                 kSession.insert(obj);
             }
