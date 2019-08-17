@@ -1,0 +1,21 @@
+package test
+
+// 全局变量
+global Integer key1
+global Object key2
+
+rule "test1"
+when
+    $number: Integer()
+    eval($number > key1)
+then
+    System.out.println($number + " is bigger than " + key1);
+end
+
+rule "test2"
+when
+    $obj: Object()
+then
+    System.out.println("I am a object");
+    System.out.println("$obj == key2：" + ($obj == key2));
+end
