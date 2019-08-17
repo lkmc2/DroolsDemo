@@ -31,6 +31,9 @@ public final class DroolsUtils {
     /** Drools 的环境配置 **/
     private KieBaseConfiguration configuration;
 
+    /** 存储单个 环境配置 的 Map **/
+    private Map<String, String> confMap = Maps.newConcurrentMap();
+
     /** 存储单个 global 对象的 Map **/
     private Map<String, Object> globalSingleMap = Maps.newConcurrentMap();
 
@@ -79,6 +82,7 @@ public final class DroolsUtils {
      * @return Drool 规则引擎工具类
      */
     public <T> DroolsUtils classPathDrlResource(String path, Class<T> clazz) {
+        // 添加 drl 资源文件到知识库创建器中
         builder.add(ResourceFactory.newClassPathResource(path, clazz), ResourceType.DRL);
 
         if (builder.hasErrors()) {
@@ -93,7 +97,8 @@ public final class DroolsUtils {
      * @param path 文件路径
      * @return Drool 规则引擎工具类
      */
-    public <T> DroolsUtils classPathDrlResource(String path) {
+    public DroolsUtils classPathDrlResource(String path) {
+        // 添加 drl 资源文件到知识库创建器中
         builder.add(ResourceFactory.newClassPathResource(path), ResourceType.DRL);
 
         if (builder.hasErrors()) {
@@ -108,8 +113,19 @@ public final class DroolsUtils {
      * @param configuration 环境配置
      * @return Drool 规则引擎工具类
      */
-    public <T> DroolsUtils configuration(KieBaseConfiguration configuration) {
+    public DroolsUtils configuration(KieBaseConfiguration configuration) {
         this.configuration = configuration;
+        return this;
+    }
+
+    /**
+     * 设置一条 Drools 的环境配置
+     * @param key 配置信息的关键字
+     * @param value 配置信息的值
+     * @return Drool 规则引擎工具类
+     */
+    public DroolsUtils conf(String key, String value) {
+        this.confMap.put(key, value);
         return this;
     }
 
@@ -192,6 +208,7 @@ public final class DroolsUtils {
     private void resetField() {
         builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         configuration = null;
+        confMap = Maps.newConcurrentMap();
         globalSingleMap = Maps.newConcurrentMap();
         globalManyMap = null;
         globalManyImmutableMap = null;
@@ -263,6 +280,15 @@ public final class DroolsUtils {
         if (ObjectUtil.isNotNull(this.configuration)) {
             // 环境配置非空时，设置环境配置
             kBase = KnowledgeBaseFactory.newKnowledgeBase(this.configuration);
+        } else if (MapUtil.isNotEmpty(this.confMap)) {
+            // 存储单条环境配置的 Map 非空时，循环设置环境配置
+            KieBaseConfiguration kbConf = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
+
+            for (Map.Entry<String, String> entry : this.confMap.entrySet()) {
+                kbConf.setProperty(entry.getKey(), entry.getValue());
+            }
+
+            kBase = KnowledgeBaseFactory.newKnowledgeBase(kbConf);
         } else {
             // 使用默认环境配置
             kBase = KnowledgeBaseFactory.newKnowledgeBase();

@@ -113,7 +113,7 @@ public class DroolsUtilsTest {
     }
 
     /**
-     * 设置环境参数的例子1
+     * 设置环境参数的例子2
      */
     @Test
     public void setConfiguration2() {
@@ -129,6 +129,29 @@ public class DroolsUtilsTest {
         // 注意：global 方法 和 insert 方法都可以执行多次，重复出现不会覆盖之前设置的值
         DroolsUtils.newKieSession() // 开启新的会话
                 .configuration(kbConf) // 设置配置信息
+                .classPathDrlResource("demo.drl") // 设置在 classpath 中的 drl 文件名
+                .global("list", list) // 设置一个 global 对象
+                .insert(new BigDecimal("1.5")) // 设置一个 insert 对象
+                .execute(); // 执行所有规则
+
+        System.out.println(list.size());
+        System.out.println(list.get(0));
+
+        assertEquals(1, list.size());
+        assertEquals(new BigDecimal("1.5"), list.get(0));
+    }
+
+    /**
+     * 设置环境参数的例子3
+     */
+    @Test
+    public void setConfiguration3() {
+        List<BigDecimal> list = new ArrayList<BigDecimal>();
+
+        // 注意：conf 方法、global 方法 和 insert 方法都可以执行多次，重复出现不会覆盖之前设置的值
+        DroolsUtils.newKieSession() // 开启新的会话
+                .conf("org.drools.sequential", "true") // 设置单条环境配置
+                .conf("drools.maintainTms", "true") // 设置单条环境配置
                 .classPathDrlResource("demo.drl") // 设置在 classpath 中的 drl 文件名
                 .global("list", list) // 设置一个 global 对象
                 .insert(new BigDecimal("1.5")) // 设置一个 insert 对象
