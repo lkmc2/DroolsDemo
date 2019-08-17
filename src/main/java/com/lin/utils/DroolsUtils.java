@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.KnowledgeBuilder;
@@ -26,6 +27,9 @@ public final class DroolsUtils {
 
     /** 知识库创建器 **/
     private KnowledgeBuilder builder;
+
+    /** Drools 的环境配置 **/
+    private KieBaseConfiguration configuration;
 
     /** 存储单个 global 对象的 Map **/
     private Map<String, Object> globalSingleMap = Maps.newConcurrentMap();
@@ -100,6 +104,16 @@ public final class DroolsUtils {
     }
 
     /**
+     * 设置 Drools 的环境配置
+     * @param configuration 环境配置
+     * @return Drool 规则引擎工具类
+     */
+    public <T> DroolsUtils configuration(KieBaseConfiguration configuration) {
+        this.configuration = configuration;
+        return this;
+    }
+
+    /**
      * 设置单个全局变量
      * @param name 全局变量名
      * @return object 全局变量
@@ -154,57 +168,93 @@ public final class DroolsUtils {
      */
     public void execute() {
         // 创建知识库基础
-        InternalKnowledgeBase kBase = KnowledgeBaseFactory.newKnowledgeBase();
-        // 添加规则到知识库基础
-        kBase.addPackages(builder.getKnowledgePackages());
-
+        InternalKnowledgeBase kBase = initKnowledgeBase();
         // 创建会话
         KieSession kSession = kBase.newKieSession();
 
-        // 存储单个 global 对象的 Map
-        if (MapUtil.isNotEmpty(globalSingleMap)) {
-            for (Map.Entry<String, Object> entry : globalSingleMap.entrySet()) {
-                // 设置全局变量
-                kSession.setGlobal(entry.getKey(), entry.getValue());
-            }
-        }
-
-        // 存储多个 global 对象的 Map
-        if (MapUtil.isNotEmpty(globalManyMap)) {
-            for (Map.Entry<String, Object> entry : globalManyMap.entrySet()) {
-                // 设置全局变量
-                kSession.setGlobal(entry.getKey(), entry.getValue());
-            }
-        }
-
-        // 存储多个 global 对象的不可变 Map
-        if (ObjectUtil.isNotNull(globalManyImmutableMap)) {
-            for (Map.Entry<String, Object> entry : globalManyImmutableMap.entrySet()) {
-                // 设置全局变量
-                kSession.setGlobal(entry.getKey(), entry.getValue());
-            }
-        }
-
-        // 存储单个需要 insert 的对象的列表
-        if (CollectionUtil.isNotEmpty(insertSingleList)) {
-            for (Object obj : insertSingleList) {
-                // 插入变量
-                kSession.insert(obj);
-            }
-        }
-
-        // 存储多个需要 insert 的对象的列表
-        if (CollectionUtil.isNotEmpty(insertManyList)) {
-            for (Object obj : insertManyList) {
-                // 插入变量
-                kSession.insert(obj);
-            }
-        }
+        // 初始化全局对象
+        initGlobals(kSession);
+        // 初始化需要 insert 到 drl 文件中的对象
+        initInsert(kSession);
 
         // 执行所有规则
         kSession.fireAllRules();
         // 释放连接和资源
         kSession.dispose();
+    }
+
+    /**
+     * 初始化需要 insert 到 drl 文件中的对象
+     * @param kSession 会话
+     */
+    private void initInsert(KieSession kSession) {
+        // 存储单个需要 insert 的对象的列表
+        setInsert(kSession, insertSingleList);
+
+        // 存储多个需要 insert 的对象的列表
+        setInsert(kSession, insertManyList);
+    }
+
+    /**
+     * 设置需要 insert 到 drl 文件中的对象
+     * @param kSession 会话
+     * @param insertList 需要执行 insert 操作的对象列表
+     */
+    private void setInsert(KieSession kSession, List<Object> insertList) {
+        if (CollectionUtil.isNotEmpty(insertList)) {
+            for (Object obj : insertList) {
+                // 插入变量
+                kSession.insert(obj);
+            }
+        }
+    }
+
+    /**
+     * 初始化全局对象
+     * @param kSession 会话
+     */
+    private void initGlobals(KieSession kSession) {
+        // 存储单个 global 对象的 Map
+        setGlobal(kSession, globalSingleMap);
+
+        // 存储多个 global 对象的 Map
+        setGlobal(kSession, globalManyMap);
+
+        // 存储多个 global 对象的不可变 Map
+        setGlobal(kSession, globalManyImmutableMap);
+    }
+
+    /**
+     * 设置全局变量
+     * @param kSession 会话
+     * @param globalMap 存储全局变量的 map
+     */
+    private void setGlobal(KieSession kSession, Map<String, Object> globalMap) {
+        if (MapUtil.isNotEmpty(globalMap)) {
+            for (Map.Entry<String, Object> entry : globalMap.entrySet()) {
+                // 设置全局变量
+                kSession.setGlobal(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    /**
+     * 初始化知识库基础
+     * @return 知识库基础
+     */
+    private InternalKnowledgeBase initKnowledgeBase() {
+        InternalKnowledgeBase kBase;
+        if (ObjectUtil.isNotNull(this.configuration)) {
+            // 环境配置非空时，设置环境配置
+            kBase = KnowledgeBaseFactory.newKnowledgeBase(this.configuration);
+        } else {
+            // 使用默认环境配置
+            kBase = KnowledgeBaseFactory.newKnowledgeBase();
+        }
+
+        // 添加规则到知识库基础
+        kBase.addPackages(builder.getKnowledgePackages());
+        return kBase;
     }
 
 }
