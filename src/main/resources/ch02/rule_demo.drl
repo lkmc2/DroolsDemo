@@ -1,0 +1,19 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+# 声明一个规则
+rule "rule_name"
+    dialect "java" # 指定配置参数（可以没有配置参数），语言默认是 java
+
+    # 一个规则中只可以有一组 when then
+    when
+        eval(2 > 1) # 判断条件，相当于 if，这里需要使用 eval 函数才能执行判断逻辑
+    then
+        System.out.println("2 > 1"); # 当判断条件成立时，执行此处的代码
+end
+
+# 声明一个规则
+rule "rule2"
+    # 以下是正确的语法
+    when # 当 when 后面没有条件时，系统默认会加上 eval(true) ，表示无条件执行
+    then # then 后面没有代码时，表示什么也不做
+end

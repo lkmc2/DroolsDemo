@@ -36,7 +36,7 @@ public class StatelessKnowledgeSession2 {
     public static void main(String[] args) {
         KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         // 添加 drl 资源文件
-        kBuilder.add(ResourceFactory.newClassPathResource("StatelessKnowledgeSession2.drl", StatelessKnowledgeSession2.class),
+        kBuilder.add(ResourceFactory.newClassPathResource("ch01/StatelessKnowledgeSession2.drl", StatelessKnowledgeSession2.class),
                      ResourceType.DRL);
 
         // 获取知识包集合（即规则列表）
