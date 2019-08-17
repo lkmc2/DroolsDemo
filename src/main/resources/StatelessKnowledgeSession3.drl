@@ -1,0 +1,16 @@
+package test
+
+rule "test1"
+when
+    $number: Integer()
+    eval($number > 0)
+then
+    System.out.println("I am bigger than 0");
+end
+
+rule "test2"
+when
+    obj: Object()
+then
+    System.out.println("I am a object");
+end
