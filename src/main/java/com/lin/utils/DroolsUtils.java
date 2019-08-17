@@ -181,6 +181,22 @@ public final class DroolsUtils {
         kSession.fireAllRules();
         // 释放连接和资源
         kSession.dispose();
+
+        // 重置工具类中的参数
+        resetField();
+    }
+
+    /**
+     * 重置工具类中的参数
+     */
+    private void resetField() {
+        builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        configuration = null;
+        globalSingleMap = Maps.newConcurrentMap();
+        globalManyMap = null;
+        globalManyImmutableMap = null;
+        insertSingleList = Lists.newCopyOnWriteArrayList();
+        insertManyList = null;
     }
 
     /**
