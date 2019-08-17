@@ -11,6 +11,7 @@ import java.util.Properties;
  * @author lkmc2
  * @date 2019/8/17 10:20
  */
+@SuppressWarnings("ConfusingArgumentToVarargsMethod")
 public class PropertiesAsConfiguration {
 
     public static void main(String[] args) {
