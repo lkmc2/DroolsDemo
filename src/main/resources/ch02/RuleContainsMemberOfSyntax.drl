@@ -1,0 +1,88 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+// 导入类
+import com.lin.ch02.entity.Order
+import com.lin.ch02.entity.Customer
+
+rule "rule1"
+        /*
+        [绑定标量名: ]Object([field 约束])
+        1.对于一个 pattern 来说“绑定变量名”是可选的，
+        如果在当前规则的 LHS 部分的其它的 pattern 要用到这个对象，
+        那么可以通过为该对象设定一个绑定变量名来实现对其引用
+
+        2.“field 约束”是指当前对象里相关字段的条件限制
+
+        contains 操作符的语法如下：
+        Object(field[Collection/Array] contains value)
+
+        when 条件解析：
+        （1）$order: Order() 表示判断 insert 进来的 fact 对象是否是 Order 类的实例，
+            是的话将该对象的引用绑定到 $order 变量
+        （2）$customer: Customer(age > 20, orderList contains $order)
+            表示判断 insert 进来的 fact 对象是否是 Customer 类的实例，
+            同时 age 属性需要大于 20，并且 $customer 中的 orderList 属性（List或数组）中需要包含上面出现的 $order 对象，
+            同时满足这些条件，才将 Customer 对象的实例的引用绑定到变量 $customer
+        */
+        // 每一行表达式后面可以加分号，也可以不加
+    when
+        $order: Order();
+        $customer: Customer(age > 20, orderList contains $order);
+    then
+        System.out.println(String.format("rule1: I am %s, and have order %s", $customer.getName(), $order));
+end
+
+rule "rule2"
+    /*
+    not contains 操作符的语法如下：
+    Object(field[Collection/Array] not contains value)
+
+    when 条件解析：
+    （1）$order: Order(items not contains "手机")
+        表示判断 insert 进来的 fact 对象是否是 Order 类的实例，
+        并且 items 属性不包含 "手机" 这个字符串，
+        满足条件的话将该对象的引用绑定到 $order 变量
+    */
+    when
+        $order: Order(items not contains "手机");
+    then
+        System.out.println(String.format("rule2: order name is %s, not contains 手机", $order.getName()));
+end
+
+rule "rule3"
+    /*
+    memberOf 操作符的语法如下：
+    Object(fieldName memberOf value[Collection/Array])
+
+    memberOf 用法和 contains 类似，不过 memberOf 把列表或数组放在后面，而 contains 把列表或数组放在前面
+
+    when 条件解析：
+    （1）$order: Order("可乐" memberOf items)
+        表示判断 insert 进来的 fact 对象是否是 Order 类的实例，
+        并且 items 属性包含 "可乐" 这个字符串，
+        满足条件的话将该对象的引用绑定到 $order 变量
+    */
+    when
+        $order: Order("可乐" memberOf items);
+    then
+        System.out.println(String.format("rule3: order name is %s, 可乐 memberOf items", $order.getName()));
+end
+
+rule "rule4"
+    /*
+    not memberOf 操作符的语法如下：
+    Object(fieldName not memberOf value[Collection/Array])
+
+    memberOf 用法和 contains 类似，不过 memberOf 把列表或数组放在后面，而 contains 把列表或数组放在前面
+
+    when 条件解析：
+    （1）$order: Order("炸弹" not memberOf items)
+        表示判断 insert 进来的 fact 对象是否是 Order 类的实例，
+        并且 items 属性不包含 "炸弹" 这个字符串，
+        满足条件的话将该对象的引用绑定到 $order 变量
+    */
+    when
+        $order: Order("炸弹" not memberOf items);
+    then
+        System.out.println(String.format("rule4: order name is %s, 炸弹 not memberOf items", $order.getName()));
+end

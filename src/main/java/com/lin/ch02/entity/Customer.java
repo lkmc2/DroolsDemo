@@ -1,4 +1,6 @@
-package com.lin.ch02;
+package com.lin.ch02.entity;
+
+import java.util.List;
 
 /**
  * 顾客实体类
@@ -10,6 +12,7 @@ public class Customer {
     private Integer age;
     private String gender;
     private String city;
+    private List<Order> orderList;
 
     public Customer() {
     }
@@ -51,6 +54,14 @@ public class Customer {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<Order> getOrderList() {
+        return orderList;
+    }
+
+    public void setOrderList(List<Order> orderList) {
+        this.orderList = orderList;
     }
 
     @Override
