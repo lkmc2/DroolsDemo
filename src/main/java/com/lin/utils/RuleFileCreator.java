@@ -24,10 +24,10 @@ public final class RuleFileCreator {
     private static String packageName;
 
     /** 需要 import 的类名集合 **/
-    private Set<String> importNameSet = Sets.newConcurrentHashSet();
+    private Set<String> importNameSet = Sets.newLinkedHashSet();
 
     /** 规则集合 **/
-    private Set<Rule> ruleSet = Sets.newConcurrentHashSet();
+    private Set<Rule> ruleSet = Sets.newLinkedHashSet();
 
     /**  单例模式创建 Drool 规则引擎工具类 **/
     private static class RuleFileCreatorHolder {
@@ -124,8 +124,8 @@ public final class RuleFileCreator {
      */
     private void resetParams() {
         packageName = null;
-        this.importNameSet = Sets.newConcurrentHashSet();
-        this.ruleSet = Sets.newConcurrentHashSet();
+        this.importNameSet = Sets.newLinkedHashSet();
+        this.ruleSet = Sets.newLinkedHashSet();
     }
 
     /**
