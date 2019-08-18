@@ -164,4 +164,14 @@ public class DroolsUtilsTest {
         assertEquals(new BigDecimal("1.5"), list.get(0));
     }
 
+    /**
+     * 不传递对象，直接执行规则的例子
+     */
+    @Test
+    public void notInsertOperation() {
+        DroolsUtils.newKieSession() // 开启新的会话
+                .classPathDrlResource("ch02/RuleInsertSyntax.drl") // 设置在 classpath 中的 drl 文件名
+                .execute(); // 执行所有规则
+    }
+
 }
