@@ -6,7 +6,6 @@ import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.io.File;
@@ -24,11 +23,11 @@ public final class RuleFileCreator {
     /** drl 文件的包名 **/
     private static String packageName;
 
-    /** 需要 import 的类名列表 **/
+    /** 需要 import 的类名集合 **/
     private Set<String> importNameSet = Sets.newConcurrentHashSet();
 
-    /** 规则列表 **/
-    private List<Rule> ruleList = Lists.newCopyOnWriteArrayList();
+    /** 规则集合 **/
+    private Set<Rule> ruleSet = Sets.newConcurrentHashSet();
 
     /**  单例模式创建 Drool 规则引擎工具类 **/
     private static class RuleFileCreatorHolder {
@@ -48,6 +47,7 @@ public final class RuleFileCreator {
      * @return 规则文件创建器
      */
     public static RuleFileCreator packageName(String packageName) {
+        Preconditions.checkArgument(StrUtil.isNotEmpty(packageName), "包名不能为空");
         RuleFileCreator.packageName = packageName;
         return getInstance();
     }
@@ -57,16 +57,38 @@ public final class RuleFileCreator {
      * @return 规则文件创建器
      */
     public RuleFileCreator importName(String importName) {
+        Preconditions.checkArgument(StrUtil.isNotEmpty(importName), "传入的导入类名不能为空");
         this.importNameSet.add(importName);
         return this;
     }
 
     /**
-     * 添加规则
+     * 设置 drl 文件导入的类名
+     * @return 规则文件创建器
+     */
+    public RuleFileCreator importNameList(List<String> importNameList) {
+        Preconditions.checkArgument(CollectionUtil.isNotEmpty(importNameList), "传入的导入类名列表不能为空");
+        this.importNameSet.addAll(importNameList);
+        return this;
+    }
+
+    /**
+     * 添加规则列表
      * @return 规则文件创建器
      */
     public RuleFileCreator addRule(Rule rule) {
-        this.ruleList.add(rule);
+        Preconditions.checkNotNull(rule, "传入的规则不能为空");
+        this.ruleSet.add(rule);
+        return this;
+    }
+
+    /**
+     * 添加规则列表，可一次性添加多个规则
+     * @return 规则文件创建器
+     */
+    public RuleFileCreator addRuleList(List<Rule> ruleList) {
+        Preconditions.checkArgument(CollectionUtil.isNotEmpty(ruleList), "传入的规则列表不能为空");
+        this.ruleSet.addAll(ruleList);
         return this;
     }
 
@@ -75,6 +97,8 @@ public final class RuleFileCreator {
      * @param targetPath 生成 drl 文件的路径
      */
     public void exportToFile(String targetPath) {
+        Preconditions.checkArgument(StrUtil.isNotBlank(targetPath), "导出文件路径不能为空");
+
         File file = new File(targetPath);
 
         // 创建新文件
@@ -89,7 +113,19 @@ public final class RuleFileCreator {
         // 写入内容到文件
         writeContentToFile(drlContent, file);
 
+        // 重置参数
+        resetParams();
+
         System.out.println(String.format("生成文件 【%s】 成功", targetPath));
+    }
+
+    /**
+     * 重置参数
+     */
+    private void resetParams() {
+        packageName = null;
+        this.importNameSet = Sets.newConcurrentHashSet();
+        this.ruleSet = Sets.newConcurrentHashSet();
     }
 
     /**
@@ -97,6 +133,8 @@ public final class RuleFileCreator {
      * @param targetPath 生成 drl 文件的路径
      */
     public void exportFileToClasspath(String targetPath) {
+        Preconditions.checkArgument(StrUtil.isNotBlank(targetPath), "导出classpath的文件路径不能为空");
+
         // classpath 的绝对路径
         String parentAbsolutePath = new ClassPathResource(".").getAbsolutePath();
         // 导出生成的规则文件到指定路径
@@ -129,7 +167,7 @@ public final class RuleFileCreator {
 
         sb.append("\n");
 
-        for (Rule rule : ruleList) {
+        for (Rule rule : ruleSet) {
             // 写入规则内容
             writeRule(rule, sb);
         }
@@ -189,16 +227,14 @@ public final class RuleFileCreator {
         sb.append("\n");
     }
 
-
-
     /**
      * 验证参数是否正确
      */
     private void validateParams() {
         Preconditions.checkArgument(StrUtil.isNotBlank(packageName), "包名不能为空");
-        Preconditions.checkArgument(CollectionUtil.isNotEmpty(ruleList), "规则不能为空，请添加规则");
+        Preconditions.checkArgument(CollectionUtil.isNotEmpty(ruleSet), "规则不能为空，请添加规则");
 
-        for (Rule rule : ruleList) {
+        for (Rule rule : ruleSet) {
             // 验证规则中参数是否正确
             rule.validateParams();
         }

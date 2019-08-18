@@ -21,6 +21,9 @@ public class RuleFileCreatorTest {
                 .when("eval(true)")
                 .then("System.out.println(\"rule2----\"+$customer.getName());");
 
+        // 校验参数
+        rule.validateParams();
+
         System.out.println(rule);
     }
 
