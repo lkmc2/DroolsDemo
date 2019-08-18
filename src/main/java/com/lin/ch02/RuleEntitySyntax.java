@@ -10,15 +10,15 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
 
 /**
- * 规则语法的例子2
+ * 类实例相关规则语法的例子
  * @author lkmc2
  * @date 2019/8/17 17:37
  */
-public class RuleDemo2 {
+public class RuleEntitySyntax {
 
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        builder.add(ResourceFactory.newClassPathResource("ch02/rule_demo2.drl", Demo.class), ResourceType.DRL);
+        builder.add(ResourceFactory.newClassPathResource("ch02/RuleEntitySyntax.drl", Demo.class), ResourceType.DRL);
 
         if (builder.hasErrors()) {
             throw new RuntimeException(builder.getErrors().toString());
