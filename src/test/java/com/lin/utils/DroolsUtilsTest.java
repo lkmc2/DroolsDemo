@@ -28,8 +28,8 @@ public class DroolsUtilsTest {
 
         DroolsUtils.newKieSession() // 开启新的会话
                 .classPathDrlResource("demo.drl") // 设置在 classpath 中的 drl 文件名
-                .globalMany(ImmutableMap.<String, Object>of("list", list)) // 设置多个 global 对象
-                .insertMany(Lists.<Object>newArrayList(new BigDecimal("1.5"))) // 设置多个 insert 对象
+                .globalMany(ImmutableMap.of("list", list)) // 设置多个 global 对象
+                .insertMany(Lists.newArrayList(new BigDecimal("1.5"))) // 设置多个 insert 对象
                 .execute(); // 执行所有规则
 
         System.out.println(list.size());
@@ -172,6 +172,48 @@ public class DroolsUtilsTest {
         DroolsUtils.newKieSession() // 开启新的会话
                 .classPathDrlResource("ch02/RuleInsertSyntax.drl") // 设置在 classpath 中的 drl 文件名
                 .execute(); // 执行所有规则
+    }
+
+    /**
+     * 使用 RuleFileCreator 生成 drl 文件，并用 DroolsUtils 执行规则的例子
+     */
+    @Test
+    public void workWithRuleFileCreator() {
+        StringBuilder sb = new StringBuilder();
+
+        // 创建规则
+        Rule rule1 = Rule.newInstance()
+                .name("rule1")
+                .attribute("dialect", "\"java\"")
+                .when(sb.append("$bd : BigDecimal()")
+                        .append("\n")
+                        .append("\t\t")
+                        .append("eval($bd.compareTo(BigDecimal.ZERO) > 0);")
+                        .toString())
+                .then("list.add($bd);");
+
+        // 将规则导出成 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.math.BigDecimal")
+                .global("java.util.List", "list")
+                .addRule(rule1)
+                .exportFileToClasspath("test/test7.drl");
+
+        // 需要传给 drl 文件的全局参数
+        List<BigDecimal> list = new ArrayList<>();
+
+        // 调用 drl 文件，执行规则
+        DroolsUtils.newKieSession() // 开启新的会话
+                .classPathDrlResource("test/test7.drl") // 设置在 classpath 中的 drl 文件名
+                .global("list", list) // 设置全局参数
+                .insert(new BigDecimal("1.5")) // 设置一个 insert 对象
+                .execute(); // 执行所有规则
+
+        System.out.println(list.size());
+        System.out.println(list.get(0));
+
+        assertEquals(1, list.size());
+        assertEquals(new BigDecimal("1.5"), list.get(0));
     }
 
 }

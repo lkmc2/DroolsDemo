@@ -6,6 +6,7 @@ import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.io.File;
@@ -24,10 +25,13 @@ public final class RuleFileCreator {
     private static String packageName;
 
     /** 需要 import 的类名集合 **/
-    private Set<String> importNameSet = Sets.newLinkedHashSet();
+    private Set<String> importClassSet = Sets.newLinkedHashSet();
 
     /** 规则集合 **/
     private Set<Rule> ruleSet = Sets.newLinkedHashSet();
+
+    /** 存储全局变量的 Map **/
+    private Map<String, String> globalMap = Maps.newConcurrentMap();
 
     /**  单例模式创建 Drool 规则引擎工具类 **/
     private static class RuleFileCreatorHolder {
@@ -56,19 +60,43 @@ public final class RuleFileCreator {
      * 设置 drl 文件导入的类名
      * @return 规则文件创建器
      */
-    public RuleFileCreator importName(String importName) {
+    public RuleFileCreator importClass(String importName) {
         Preconditions.checkArgument(StrUtil.isNotEmpty(importName), "传入的导入类名不能为空");
-        this.importNameSet.add(importName);
+        this.importClassSet.add(importName);
         return this;
     }
 
     /**
-     * 设置 drl 文件导入的类名
+     * 设置 drl 文件导入的类名列表
      * @return 规则文件创建器
      */
-    public RuleFileCreator importNameList(List<String> importNameList) {
+    public RuleFileCreator importClassList(List<String> importNameList) {
         Preconditions.checkArgument(CollectionUtil.isNotEmpty(importNameList), "传入的导入类名列表不能为空");
-        this.importNameSet.addAll(importNameList);
+        this.importClassSet.addAll(importNameList);
+        return this;
+    }
+
+    /**
+     * 设置全局参数
+     * @param className 全局参数的类名（需要带包名）
+     * @param fieldName 全局参数在 drl 文件中的变量名
+     * @return 规则文件创建器
+     */
+    public RuleFileCreator global(String className, String fieldName) {
+        Preconditions.checkArgument(StrUtil.isNotEmpty(className), "传入的global方法的类名不能为空");
+        Preconditions.checkArgument(StrUtil.isNotEmpty(fieldName), "传入的global方法的变量名不能为空");
+        this.globalMap.put(className, fieldName);
+        return this;
+    }
+
+    /**
+     * 设置全局参数 Map
+     * @param globalMap 全局参数 Map
+     * @return 规则文件创建器
+     */
+    public RuleFileCreator globalMap(Map<String, String> globalMap) {
+        Preconditions.checkArgument(CollectionUtil.isNotEmpty(globalMap), "传入的globalMap方法的全局参数Map不能为空");
+        this.globalMap.putAll(globalMap);
         return this;
     }
 
@@ -124,7 +152,7 @@ public final class RuleFileCreator {
      */
     private void resetParams() {
         packageName = null;
-        this.importNameSet = Sets.newLinkedHashSet();
+        this.importClassSet = Sets.newLinkedHashSet();
         this.ruleSet = Sets.newLinkedHashSet();
     }
 
@@ -160,12 +188,21 @@ public final class RuleFileCreator {
         sb.append(String.format("package %s", packageName));
         sb.append("\n\n");
 
-        for (String importName : importNameSet) {
+        for (String importName : importClassSet) {
             // 写入导入类的信息
             writeImport(importName, sb);
         }
 
-        sb.append("\n");
+        // 集合元素非空时添加换行符
+        addNewLine(sb, CollectionUtil.isNotEmpty(importClassSet));
+
+        for (Map.Entry<String, String> entry : globalMap.entrySet()) {
+            // 写入全局参数的信息
+            writeGlobal(entry.getKey(), entry.getValue(), sb);
+        }
+
+        // 集合元素非空时添加换行符
+        addNewLine(sb, CollectionUtil.isNotEmpty(globalMap));
 
         for (Rule rule : ruleSet) {
             // 写入规则内容
@@ -215,6 +252,28 @@ public final class RuleFileCreator {
 
         sb.append("end");
         sb.append("\n\n");
+    }
+
+    /**
+     * 集合元素非空时添加换行符
+     * @param sb 字符串生成器
+     * @param notEmpty 集合是否为空
+     */
+    private void addNewLine(StringBuilder sb, boolean notEmpty) {
+        if (notEmpty) {
+            sb.append("\n");
+        }
+    }
+
+    /**
+     * 写入全局参数的信息
+     * @param className 全局参数类名
+     * @param fieldName 全局参数在 drl 文件中的变量名
+     * @param sb 字符串生成器
+     */
+    private void writeGlobal(String className, String fieldName, StringBuilder sb) {
+        sb.append(String.format("global %s %s;", className, fieldName));
+        sb.append("\n");
     }
 
     /**

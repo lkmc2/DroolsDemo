@@ -107,8 +107,8 @@ public class RuleFileCreatorErrorTest {
     public void packageEmpty() {
         // 创建 drl 文件
         RuleFileCreator.packageName("")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .exportToFile("D:/test1.drl");
     }
 
@@ -119,7 +119,7 @@ public class RuleFileCreatorErrorTest {
     public void importNameEmpty() {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("")
+                .importClass("")
                 .exportFileToClasspath("test/test1.drl");
     }
 
@@ -130,7 +130,7 @@ public class RuleFileCreatorErrorTest {
     public void importNameListEmpty() {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importNameList(new ArrayList<>())
+                .importClassList(new ArrayList<>())
                 .exportFileToClasspath("test/test1.drl");
     }
 
@@ -141,8 +141,8 @@ public class RuleFileCreatorErrorTest {
     public void ruleEmpty() {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .addRule(null)
                 .exportFileToClasspath("test/test1.drl");
     }
@@ -154,8 +154,8 @@ public class RuleFileCreatorErrorTest {
     public void emptyRuleList() {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .addRuleList(new ArrayList<>())
                 .exportFileToClasspath("test/test1.drl");
     }
@@ -167,8 +167,8 @@ public class RuleFileCreatorErrorTest {
     public void notRule() {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .exportFileToClasspath("test/test1.drl");
     }
 
@@ -187,8 +187,8 @@ public class RuleFileCreatorErrorTest {
 
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .addRule(rule1)
                 .exportToFile("");
     }
@@ -208,8 +208,8 @@ public class RuleFileCreatorErrorTest {
 
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
-                .importName("java.util.List")
-                .importName("java.util.Date")
+                .importClass("java.util.List")
+                .importClass("java.util.Date")
                 .addRule(rule1)
                 .exportFileToClasspath("");
     }
