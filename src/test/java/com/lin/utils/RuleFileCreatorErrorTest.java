@@ -3,6 +3,7 @@ package com.lin.utils;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * 规则文件创建器的错误测试
@@ -131,6 +132,42 @@ public class RuleFileCreatorErrorTest {
         // 创建 drl 文件
         RuleFileCreator.packageName("test")
                 .importClassList(new ArrayList<>())
+                .exportFileToClasspath("test/test1.drl");
+    }
+
+    /**
+     * global 参数的类名为空
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void globalClassNameEmpty() {
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.List")
+                .global("", "list")
+                .exportFileToClasspath("test/test1.drl");
+    }
+
+    /**
+     * global 参数的在 drl 文件中的变量名为空
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void globalFieldNameEmpty() {
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.List")
+                .global("java.util.List", "")
+                .exportFileToClasspath("test/test1.drl");
+    }
+
+    /**
+     * 传入的 global Map 为空
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void globalMapEmpty() {
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.List")
+               .globalMap(new HashMap<>())
                 .exportFileToClasspath("test/test1.drl");
     }
 

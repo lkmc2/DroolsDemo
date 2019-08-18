@@ -1,5 +1,6 @@
 package com.lin.utils;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -197,6 +198,72 @@ public class RuleFileCreatorTest {
                 .addRule(rule2)
                 .addRuleList(Arrays.asList(rule3, rule4))
                 .exportFileToClasspath("test/test6.drl");
+    }
+
+    /**
+     * 创建 drl 文件，并设置 global 参数
+     */
+    @Test
+    public void createDrlFileAndUseGlobal() {
+        // 创建规则
+        Rule rule1 = Rule.newInstance()
+                .attribute("salience", "2")
+                .attribute("no-loop", "true")
+                .name("rule1")
+                .when("eval(true)")
+                .then("System.out.println(\"rule2----show\");");
+
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.Date")
+                .global("java.util.List", "list")
+                .global("java.lang.Integer", "intValue")
+                .addRule(rule1)
+                .exportFileToClasspath("test/test8.drl");
+    }
+
+    /**
+     * 创建 drl 文件，并使用 Map 设置 global 参数
+     */
+    @Test
+    public void createDrlFileAndUseGlobalMap() {
+        // 创建规则
+        Rule rule1 = Rule.newInstance()
+                .attribute("salience", "2")
+                .attribute("no-loop", "true")
+                .name("rule1")
+                .when("eval(true)")
+                .then("System.out.println(\"rule2----show\");");
+
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.Date")
+                .globalMap(ImmutableMap.of("java.util.List", "list", "java.lang.Integer", "intValue"))
+                .addRule(rule1)
+                .exportFileToClasspath("test/test9.drl");
+    }
+
+    /**
+     * 创建 drl 文件，并同时使用 global 和 globalMap 方法
+     */
+    @Test
+    public void createDrlFileAndUseGlobalAndGlobalMap() {
+        // 创建规则
+        Rule rule1 = Rule.newInstance()
+                .attribute("salience", "2")
+                .attribute("no-loop", "true")
+                .name("rule1")
+                .when("eval(true)")
+                .then("System.out.println(\"rule2----show\");");
+
+        // 创建 drl 文件
+        RuleFileCreator.packageName("test")
+                .importClass("java.util.Date")
+                .global("java.util.List", "list")
+                .global("java.lang.Integer", "intValue")
+                .globalMap(ImmutableMap.of("java.lang.Double", "doubleValue", "java.lang.Long", "longValue"))
+                .addRule(rule1)
+                .exportFileToClasspath("test/test10.drl");
     }
 
     /**
