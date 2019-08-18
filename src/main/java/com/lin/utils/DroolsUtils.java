@@ -40,9 +40,6 @@ public final class DroolsUtils {
     /** 存储多个 global 对象的 Map **/
     private Map<String, Object> globalManyMap;
 
-    /** 存储多个 global 对象的不可变 Map **/
-    private ImmutableMap<String, Object> globalManyImmutableMap;
-
     /** 存储单个需要 insert 的对象的列表 **/
     private List<Object> insertSingleList = Lists.newCopyOnWriteArrayList();
 
@@ -150,16 +147,6 @@ public final class DroolsUtils {
     }
 
     /**
-     * 设置多个全局变量
-     * @param globalMap 全局变量不可变 Map
-     * @return Drool 规则引擎工具类
-     */
-    public DroolsUtils globalMany(ImmutableMap<String, Object> globalMap) {
-        this.globalManyImmutableMap = globalMap;
-        return this;
-    }
-
-    /**
      * 设置单个需要插入的变量
      * @param object 需要插入的变量
      * @return Drool 规则引擎工具类
@@ -211,7 +198,6 @@ public final class DroolsUtils {
         confMap = Maps.newConcurrentMap();
         globalSingleMap = Maps.newConcurrentMap();
         globalManyMap = null;
-        globalManyImmutableMap = null;
         insertSingleList = Lists.newCopyOnWriteArrayList();
         insertManyList = null;
     }
@@ -252,9 +238,6 @@ public final class DroolsUtils {
 
         // 存储多个 global 对象的 Map
         setGlobal(kSession, globalManyMap);
-
-        // 存储多个 global 对象的不可变 Map
-        setGlobal(kSession, globalManyImmutableMap);
     }
 
     /**
