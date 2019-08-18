@@ -1,5 +1,7 @@
 package com.lin.utils;
 
+import cn.hutool.core.util.StrUtil;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -70,6 +72,31 @@ public class Rule {
     public Rule then(String thenCode) {
         this.thenCode = thenCode;
         return this;
+    }
+
+    /**
+     * 验证规则中参数是否正确
+     */
+    public void validateParams() {
+        Preconditions.checkArgument(StrUtil.isNotBlank(ruleName), "规则名称不能为空");
+        Preconditions.checkArgument(StrUtil.isNotBlank(whenCondition), "when语句中条件不能为空，请添加条件");
+        Preconditions.checkArgument(StrUtil.isNotBlank(thenCode), "then语句中内容不能为空，请添加内容");
+    }
+
+    protected String getRuleName() {
+        return ruleName;
+    }
+
+    protected Map<String, String> getAttributeMap() {
+        return attributeMap;
+    }
+
+    protected String getWhenCondition() {
+        return whenCondition;
+    }
+
+    protected String getThenCode() {
+        return thenCode;
     }
 
     @Override
