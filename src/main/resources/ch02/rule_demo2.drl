@@ -1,0 +1,80 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import com.lin.ch02.Customer // 导入类
+
+rule "rule1"
+        /*
+        [绑定标量名: ]Object([field 约束])
+        1.对于一个 pattern 来说“绑定变量名”是可选的，
+        如果在当前规则的 LHS 部分的其它的 pattern 要用到这个对象，
+        那么可以通过为该对象设定一个绑定变量名来实现对其引用
+
+        2.“field 约束”是指当前对象里相关字段的条件限制
+
+        Customer() 表示判断 insert 进来的 fact 对象是否是 Customer 类的实例
+        */
+    when
+        Customer()
+    then
+        System.out.println("rule1: I am a Customer instance");
+end
+
+
+rule "rule2"
+    /*
+    $customer: Customer() 表示判断对象是否 Customer 类的实例，
+    是的话，将该对象的引用绑定到变量 $customer
+    */
+    when
+        $customer: Customer()
+    then
+        System.out.println("rule2: I am a Customer instance, my name is " + $customer.getName());
+end
+
+
+rule "rule3"
+    /*
+    $customer: Customer(age > 20, gender == "male") 表示判断对象是否 Customer 类的实例，
+    并且对象的 age 属性需大于 20，gender 属性需等于 male
+    满足所有指定条件时，将该对象的引用绑定到变量 $customer
+    */
+    when
+        $customer: Customer(age > 20, gender == "male")
+    then
+        System.out.println("rule3: I am a Customer instance, my name is " + $customer.getName());
+end
+
+rule "rule4"
+    /*
+    $customer: Customer(age > 20 || gender == "male" && city == "shanghai")
+    表示判断对象是否 Customer 类的实例，
+    并且对象的 age 属性需大于 20，
+    或者 （gender 属性需等于 male， 且 city 属性等于 shanghai）
+    满足所有指定条件时，将该对象的引用绑定到变量 $customer
+
+    注意：
+    1.&& 和 , 都是表示并且的意思；
+    2.&& 和 || 符号不能和 , 符号一起出现；即有 && 和 || 符号则不能出现 , 号，有 , 号则不能出现 && 和 || 符号；
+    3.如果没用小括号来显示定义优先级的话，那么执行顺序为：&&（and）、||（or）和 , 。
+    */
+    when
+        $customer: Customer(age > 20 || gender == "male" && city == "shanghai")
+    then
+        System.out.println("rule4: I am a Customer instance, my name is " + $customer.getName() + ", and my city is " + $customer.getCity());
+end
+
+rule "rule5"
+    /*
+    $customer: Customer(age > 20 || gender == "male" && city == "shanghai")
+    表示判断对象是否 Customer 类的实例，
+    并且对象的 age 属性需大于 20，
+    或者 （gender 属性需等于 male， 且 city 属性等于 shanghai）
+    满足所有指定条件时，将该对象的引用绑定到变量 $customer
+
+    此 rule5 规则和上面的 rule4 规则等效
+    */
+    when
+        $customer: Customer(age > 20 || (gender == "male" && city == "shanghai"))
+    then
+        System.out.println("rule5: I am a Customer instance, my name is " + $customer.getName() + ", and my city is " + $customer.getCity());
+end

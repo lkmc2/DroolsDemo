@@ -9,6 +9,17 @@ public class Customer {
     private String name;
     private Integer age;
     private String gender;
+    private String city;
+
+    public Customer() {
+    }
+
+    public Customer(String name, Integer age, String gender, String city) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.city = city;
+    }
 
     public String getName() {
         return name;
@@ -34,12 +45,21 @@ public class Customer {
         this.gender = gender;
     }
 
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
                 ", gender='" + gender + '\'' +
+                ", city='" + city + '\'' +
                 '}';
     }
 }
