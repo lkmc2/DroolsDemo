@@ -1,0 +1,46 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+// 导入类
+import com.lin.ch02.entity.Order
+import com.lin.ch02.entity.Customer
+
+rule "rule1"
+        /*
+        [绑定标量名: ]Object([field 约束])
+        1.对于一个 pattern 来说“绑定变量名”是可选的，
+        如果在当前规则的 LHS 部分的其它的 pattern 要用到这个对象，
+        那么可以通过为该对象设定一个绑定变量名来实现对其引用
+
+        2.“field 约束”是指当前对象里相关字段的条件限制
+
+        matches 操作符的语法如下：
+        Object(fieldName matches "正则表达式")
+
+        when 条件解析：
+        （1）$customer: Customer(name matches "李.*")
+            表示判断 insert 进来的 fact 对象是否是 Customer 类的实例，
+            并且 name 属性需匹配正则表达式 "李.*"，
+            满足上述条件时，才将对象的引用赋值给 $customer 变量，并执行 then 中的代码
+        */
+    when
+        $customer: Customer(name matches "李.*")
+    then
+        System.out.println(String.format("rule1: I am %s", $customer.getName()));
+end
+
+rule "rule2"
+        /*
+        not matches 操作符的语法如下：
+        Object(fieldName not matches "正则表达式")
+
+        when 条件解析：
+        （1）$customer: Customer(name matches "李.*")
+            表示判断 insert 进来的 fact 对象是否是 Customer 类的实例，
+            并且 name 属性需不匹配正则表达式 "李.*"，
+            满足上述条件时，才将对象的引用赋值给 $customer 变量，并执行 then 中的代码
+        */
+    when
+        $customer: Customer(name not matches "李.*")
+    then
+        System.out.println(String.format("rule2: I am %s", $customer.getName()));
+end
