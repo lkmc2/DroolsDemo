@@ -1,0 +1,49 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import com.lin.ch02.entity.Customer // 导入类
+
+rule "rule1"
+    /*
+    insert 和 insertLogic ，
+    这两个宏函数的作用都是将一个 Fact（即从 java 代码传给 drl 文件的 java 对象） 对象
+    插入当前的 Working Memory（工作内存）中。
+    */
+
+    // salience 指定执行规则的优先级，数值越大优先级越高
+    // 先执行 rule1 ，在执行 rule2
+    salience 2
+    when
+        eval(true)
+    then
+        Customer customer = new Customer(); // 创建实例对象
+        customer.setName("王明");
+        /*
+        调用 drools 中的 insert 宏函数，
+        一旦调用该函数，那么 drools 会重新与所有的规则在重新匹配一次，
+        对于没有设置 no-loop 属性 为true 的规则，
+        如果条件满足，不管其之前是否有执行过都会再执行一次。
+        这个特性在 update、retract 宏函数中也有。
+        在考虑不周的情况下调用这些宏函数容易发生死循环，还请注意。
+
+        halt 该宏函数表示，执行当前规则后，不再执行其他未执行的规则
+        */
+        insert(customer);
+        drools.halt();
+end
+
+rule "rule2"
+     /*
+     salience 属性指定执行规则的优先级，数值越大优先级越高
+
+    $customer: Customer(name == "王明")
+    表示传入的对象必须是 Customer 类的实例对象，
+    而且 name 属性等于 张三，
+    满足以上条件时，会把该对象的引用绑定到 $customer 变量中，
+    并执行 then 中的代码
+    */
+    salience 1
+    when
+        $customer: Customer(name == "王明")
+    then
+        System.out.println(String.format("rule2: %s", $customer.getName()));
+end
