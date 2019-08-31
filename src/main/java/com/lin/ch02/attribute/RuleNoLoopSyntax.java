@@ -1,4 +1,4 @@
-package com.lin.ch02;
+package com.lin.ch02.attribute;
 
 import com.lin.ch02.entity.Customer;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -18,7 +18,7 @@ public class RuleNoLoopSyntax {
 
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        builder.add(ResourceFactory.newClassPathResource("ch02/RuleNoLoopSyntax.drl"), ResourceType.DRL);
+        builder.add(ResourceFactory.newClassPathResource("ch02/attribute/RuleNoLoopSyntax.drl"), ResourceType.DRL);
 
         if (builder.hasErrors()) {
             throw new RuntimeException(builder.getErrors().toString());
