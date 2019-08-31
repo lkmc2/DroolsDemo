@@ -1,0 +1,50 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import com.lin.ch02.entity.Customer // 导入类
+
+rule "rule1"
+    /*
+     salience 属性指定执行规则的优先级，数值越大优先级越高
+     先执行 rule1 ，在执行 rule2
+
+    $customer: Customer(name == "王明", age == 20)
+    表示传入的对象必须是 Customer 类的实例对象，
+    而且 name 属性等于 王明，并且 age 属性等于 20，
+    满足以上条件时，会把该对象的引用绑定到 $customer 变量中，
+    并执行 then 中的代码
+    */
+    salience 2
+    when
+        $customer: Customer(name=="王明", age==20)
+    then
+        System.out.println(String.format("修改前的用户id = %s, age = %s", $customer.getId(), $customer.getAge()));
+        /*
+        modify 是一个表达式块，它可以快速实现对 Fact 对象多个属性进行修改，修改完成后
+        会自动更新到当前的 Working Memory 当中。它的基本语法格式如下：
+
+        modify(fact-expression){
+            <修改 Fact 属性的表达式>[,<修改 Fact 属性的表达式>*]
+        }
+       */
+       modify($customer){
+            setId("didi"),
+            setAge(30)
+       }
+end
+
+rule "rule2"
+     /*
+     salience 属性指定执行规则的优先级，数值越大优先级越高
+
+    $customer: Customer(name == "王明")
+    表示传入的对象必须是 Customer 类的实例对象，
+    而且 name 属性等于 王明，
+    满足以上条件时，会把该对象的引用绑定到 $customer 变量中，
+    并执行 then 中的代码
+    */
+    salience 1
+    when
+        $customer: Customer(name == "王明")
+    then
+        System.out.println(String.format("修改后的用户id = %s, age = %s", $customer.getId(), $customer.getAge()));
+end

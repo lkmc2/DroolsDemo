@@ -8,6 +8,7 @@ import java.util.List;
  * @date 2019/8/17 17:35
  */
 public class Customer {
+    private String id;
     private String name;
     private Integer age;
     private String gender;
@@ -22,6 +23,14 @@ public class Customer {
         this.age = age;
         this.gender = gender;
         this.city = city;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -67,10 +76,12 @@ public class Customer {
     @Override
     public String toString() {
         return "Customer{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", age=" + age +
                 ", gender='" + gender + '\'' +
                 ", city='" + city + '\'' +
+                ", orderList=" + orderList +
                 '}';
     }
 }
