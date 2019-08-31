@@ -1,0 +1,35 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import java.util.List; // 导入类
+import com.lin.ch02.entity.Customer;
+
+rule "rule1"
+     /*
+     salience 属性指定执行规则的优先级，数值越大优先级越高
+
+    $customer: Customer(name == "王明")
+    表示传入的对象必须是 Customer 类的实例对象，
+    而且 name 属性等于 张三，
+    满足以上条件时，会把该对象的引用绑定到 $customer 变量中，
+    并执行 then 中的代码
+
+    下面代码中使用了 update 宏函数，如果不设置 no-loop 属性为 true，
+    规则引擎会每次都重新检查所有规则，如果满足时再次调用，
+    这样会造成无限循环，如果设置了 no-loop 属性，则 rule1 只会执行一次
+    */
+    salience 1
+    no-loop true
+    when
+        $customer: Customer(name == "王明")
+    then
+        /*
+        调用 drools 中的 update 宏函数，
+        一旦调用该函数，那么 drools 会重新与所有的规则在重新匹配一次，
+        对于没有设置 no-loop 属性 为true 的规则，
+        如果条件满足，不管其之前是否有执行过都会再执行一次。
+        这个特性在 insert、retract 宏函数中也有。
+        在考虑不周的情况下调用这些宏函数容易发生死循环，还请注意。
+        */
+        update($customer)
+        System.out.println(String.format("rule1: %s", $customer.getName()));
+end
