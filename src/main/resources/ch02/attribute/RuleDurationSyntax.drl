@@ -1,0 +1,22 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import java.util.List; // 导入类
+import com.lin.ch02.entity.Customer;
+
+rule "rule1"
+     /*
+     duration
+     属性特点
+     1.设置该属性后，规则会延迟指定时间后，在另外一个线程中触发
+     2.值为长整型，单位是毫秒
+
+     下面的 duration 3000 表示：
+     该规则会在 3s 后在另外一个线程里触发
+    */
+    duration 3000
+    when
+        eval(true)
+    then
+        System.out.println("rule1 thread id：" + Thread.currentThread().getId());
+        drools.halt(); // 结束所有规则
+end
