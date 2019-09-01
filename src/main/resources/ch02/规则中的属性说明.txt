@@ -40,3 +40,9 @@
 属性特点
 1.设置该属性后，规则会延迟指定时间后，在另外一个线程中触发
 2.值为长整型，单位是毫秒
+
+八、lock-on-active
+属性特点
+1.是no-loop属性的增强版，可防止因为insert、update、retract等操作，已经执行过的规则再次执行
+2.主要用在使用ruleflow-group或agenda-group属性的时候
+3.默认值为true
