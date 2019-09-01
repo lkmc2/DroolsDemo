@@ -1,0 +1,26 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import com.lin.ch02.entity.Customer // 导入类
+
+rule "rule1"
+    /*
+    activation-group
+    属性特点
+    1.该属性将多个规则划分成一组，以字符串为该组命名
+    2.在相同的组中，只要有一个规则被执行，其他的规则都将不再执行
+    3.可用 salience 属性指定组中的哪个规则可能先被执行
+    */
+    activation-group "test-group"
+    when
+        eval(true)
+    then
+        System.out.println("rule1 执行");
+end
+
+rule "rule2"
+     activation-group "test-group"
+    when
+        eval(true)
+    then
+        System.out.println("rule2 执行");
+end

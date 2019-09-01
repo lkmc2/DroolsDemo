@@ -46,3 +46,9 @@
 1.是no-loop属性的增强版，可防止因为insert、update、retract等操作，已经执行过的规则再次执行
 2.主要用在使用ruleflow-group或agenda-group属性的时候
 3.默认值为true
+
+九、activation-group
+属性特点
+1.该属性将多个规则划分成一组，以字符串为该组命名
+2.在相同的组中，只要有一个规则被执行，其他的规则都将不再执行
+3.可用 salience 属性指定组中的哪个规则可能先被执行
