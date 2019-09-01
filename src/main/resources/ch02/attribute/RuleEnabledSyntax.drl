@@ -1,0 +1,19 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import java.util.List; // 导入类
+import com.lin.ch02.entity.Customer;
+
+rule "rule1"
+     /*
+     enabled
+     属性特点
+     1.设置单条规则是否可用
+     2.默认值为true
+     3.设置成false则规则不会执行
+    */
+    enabled true
+    when
+        eval(true)
+    then
+        System.out.println("rule1 被执行了");
+end

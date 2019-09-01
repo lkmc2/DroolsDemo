@@ -24,3 +24,8 @@
 3.日期格式为：dd-MMM-yyyy，如果是2019-08-31，则应该写成：31-Aug-2019，或者：31-八月-2019
 4.可在java代码中使用System.setProperty("drools.dateformat","yyyy-MM-dd");修改默认日期格式
 
+五、enabled
+属性特点
+1.设置单条规则是否可用
+2.默认值为true
+3.设置成false则规则不会执行
