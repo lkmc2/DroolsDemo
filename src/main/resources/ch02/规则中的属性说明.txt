@@ -16,3 +16,11 @@
 1.只有当前系统时间 >= date-effective 设置的时间值时，规则才会触发执行，否则不执行
 2.日期格式为：dd-MMM-yyyy，如果是2019-08-31，则应该写成：31-Aug-2019，或者：31-八月-2019
 3.可在java代码中使用System.setProperty("drools.dateformat","yyyy-MM-dd");修改默认日期格式
+
+四、date-expires
+属性特点
+1.与date-effective相反，该属性是设置规则的有效期的
+2.如果当前系统时间小于该值，规则才会执行
+3.日期格式为：dd-MMM-yyyy，如果是2019-08-31，则应该写成：31-Aug-2019，或者：31-八月-2019
+4.可在java代码中使用System.setProperty("drools.dateformat","yyyy-MM-dd");修改默认日期格式
+
