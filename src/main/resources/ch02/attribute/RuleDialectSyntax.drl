@@ -1,0 +1,19 @@
+package test // 包名：仅用于逻辑分区，和目录结构无关，同一包下的函数可以相互使用
+
+import java.util.List; // 导入类
+import com.lin.ch02.entity.Customer;
+
+rule "rule1"
+     /*
+     dialect
+     属性特点
+     1.用于设置定义规则要使用的语言类型
+     2.drools5中支持 java 和 mvel 两种语言
+     3.默认使用 java 语言
+    */
+    dialect "java"
+    when
+        eval(true)
+    then
+        System.out.println("rule1 当前的dialect：" + drools.getRule().getDialect());
+end

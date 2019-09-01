@@ -9,15 +9,15 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
 
 /**
- * enabled 相关规则语法的例子（设置单条规则是否生效）
+ * dialect 相关规则语法的例子（设置定时规则时所用的语言，java或mvel）
  * @author lkmc2
  * @date 2019/8/22 16:13
  */
-public class RuleEnabledSyntax {
+public class RuleDialectSyntax {
 
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        builder.add(ResourceFactory.newClassPathResource("ch02/attribute/RuleEnabledSyntax.drl"), ResourceType.DRL);
+        builder.add(ResourceFactory.newClassPathResource("ch02/attribute/RuleDialectSyntax.drl"), ResourceType.DRL);
 
         if (builder.hasErrors()) {
             throw new RuntimeException(builder.getErrors().toString());
@@ -36,7 +36,7 @@ public class RuleEnabledSyntax {
 
         /*
         运行结果：
-        rule1 被执行了
+        rule1 当前的dialect：java
          */
     }
 
